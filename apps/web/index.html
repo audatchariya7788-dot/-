@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MT5 Auto Trading</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#0f172a;color:#e2e8f0}main{max-width:1100px;margin:auto;padding:20px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:20px}.badge{padding:7px 12px;border-radius:999px;background:#334155}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:#111c31;border:1px solid #26344d;border-radius:14px;padding:16px}.label{font-size:12px;color:#94a3b8}.value{font-size:25px;font-weight:700;margin-top:6px}.wide{grid-column:1/-1}.status{font-weight:700}.online{color:#4ade80}.offline{color:#fb7185}button{border:0;border-radius:10px;padding:11px 16px;background:#334155;color:white;cursor:pointer}button:disabled{opacity:.5}.row{display:flex;justify-content:space-between;border-bottom:1px solid #26344d;padding:10px 0}.muted{color:#94a3b8}@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:500px){.grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+<main>
+  <div class="top"><div><h1>MT5 Auto Trading</h1><div class="muted">Demo control dashboard · V0.1</div></div><span id="conn" class="badge">Checking...</span></div>
+  <div class="grid">
+    <section class="card"><div class="label">Balance</div><div id="balance" class="value">-</div></section>
+    <section class="card"><div class="label">Equity</div><div id="equity" class="value">-</div></section>
+    <section class="card"><div class="label">Free Margin</div><div id="freeMargin" class="value">-</div></section>
+    <section class="card"><div class="label">EA Status</div><div id="ea" class="value">-</div></section>
+    <section class="card wide"><h2>MT5 Account</h2><div class="row"><span>Login</span><b id="login">-</b></div><div class="row"><span>Server</span><b id="server">-</b></div><div class="row"><span>Currency</span><b id="currency">-</b></div><div class="row"><span>Last Seen</span><b id="lastSeen">-</b></div></section>
+    <section class="card wide"><h2>Bot</h2><div class="row"><span>Trading execution</span><b>DISABLED (V0.1 safety mode)</b></div><div class="row"><span>Target symbol</span><b>XAUUSD</b></div><div class="row"><span>Next stage</span><b>Analysis → Risk → Demo Order</b></div></section>
+  </div>
+</main>
+<script>
+const API = window.MT5_API_BASE || '';
+const login = new URLSearchParams(location.search).get('login') || '';
+async function refresh(){
+  try{
+    const h=await fetch(API+'/health'); if(!h.ok) throw new Error('health');
+    const d=await h.json(); document.querySelector('#conn').textContent='API ONLINE · '+d.version;
+    if(!login) return;
+    const r=await fetch(API+'/api/mt5/status?login='+encodeURIComponent(login));
+    const x=await r.json(); const a=x.account;
+    if(!a) return;
+    for(const [id,val] of [['balance',a.balance],['equity',a.equity],['freeMargin',a.free_margin],['ea',a.ea_status],['login',a.login],['server',a.server],['currency',a.currency],['lastSeen',a.last_seen_at]]) document.getElementById(id).textContent=val ?? '-';
+    document.getElementById('ea').className='value '+(a.ea_status==='ONLINE'?'online':'offline');
+  }catch(e){document.querySelector('#conn').textContent='API OFFLINE'}
+}
+refresh(); setInterval(refresh,5000);
+</script>
+</body></html>
