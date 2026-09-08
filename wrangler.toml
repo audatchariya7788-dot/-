@@ -1,0 +1,11 @@
+name = "mt5-auto-trading"
+main = "workers/api/src/index.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+APP_VERSION = "0.1.0"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "mt5-auto-trading"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
