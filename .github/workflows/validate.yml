@@ -1,0 +1,24 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check Worker syntax
+        run: node --check workers/api/src/index.js
+      - name: Check dashboard exists
+        run: test -f apps/web/index.html
+      - name: Check EA exists
+        run: test -f mt5/EA/AutoTrader.mq5
+      - name: Check database schema exists
+        run: test -f database/schema.sql
